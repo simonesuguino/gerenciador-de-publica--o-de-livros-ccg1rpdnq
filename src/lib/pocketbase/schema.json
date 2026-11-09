@@ -1,5 +1,5 @@
 {
-  "generatedAt": "2026-11-09T00:43:26.689Z",
+  "generatedAt": "2026-11-09T01:09:35.350Z",
   "collections": [
     {
       "name": "users",
@@ -122,6 +122,36 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "author_name",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "archived",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cover_template",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "cover_custom",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "public_template",
+          "type": "text",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": []
@@ -262,6 +292,195 @@
         }
       ],
       "indexes": ["CREATE INDEX idx_checklist_book ON checklist_items (book_id, position ASC)"]
+    },
+    {
+      "name": "marketing_posts",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "book_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "books"
+        },
+        {
+          "name": "platform",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "scheduled_date",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "status",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["ideia", "agendado", "publicado"]
+        },
+        {
+          "name": "caption",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE INDEX idx_marketing_posts_book ON marketing_posts (book_id)"]
+    },
+    {
+      "name": "sales",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "book_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "books"
+        },
+        {
+          "name": "sale_date",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "platform",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["amazon_kdp", "kobo", "apple_books", "ingramspark", "outra"]
+        },
+        {
+          "name": "units",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "revenue",
+          "type": "number",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "currency",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "notes",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_sales_book ON sales (book_id)",
+        "CREATE INDEX idx_sales_date ON sales (sale_date)"
+      ]
+    },
+    {
+      "name": "user_preferences",
+      "type": "base",
+      "apiRules": {
+        "list": "",
+        "view": "",
+        "create": "@request.auth.id != ''",
+        "update": "@request.auth.id != ''",
+        "delete": "@request.auth.id != ''"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "theme_mode",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["claro", "escuro"]
+        },
+        {
+          "name": "accent_color",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": ["CREATE UNIQUE INDEX idx_user_prefs_user ON user_preferences (user_id)"]
     }
   ]
 }
