@@ -9,7 +9,6 @@ import {
   ArrowRight,
   Eye,
   EyeOff,
-  ShieldCheck,
   CheckCircle2,
   Lock,
 } from 'lucide-react'
@@ -18,8 +17,8 @@ import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 
 export default function Login() {
-  const [email, setEmail] = useState('simonesuguino@gmail.com')
-  const [password, setPassword] = useState('Skip@Pass')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
@@ -253,27 +252,7 @@ export default function Login() {
             </p>
           </div>
 
-          {/* Credenciais de demonstração dos perfis */}
-          <div className="mt-4 rounded-lg bg-stone-50 border border-stone-200/60 p-3 text-[11px] text-stone-500 space-y-1.5">
-            <p className="font-semibold text-stone-700 flex items-center gap-1.5">
-              <ShieldCheck className="h-3.5 w-3.5 text-amber-700" />
-              Contas de acesso configuradas:
-            </p>
-            <div className="space-y-1 font-mono text-[10px] text-stone-700">
-              <p>
-                <span className="font-semibold text-amber-800">Admin:</span> simonesuguino@gmail.com
-                (Skip@Pass)
-              </p>
-              <p>
-                <span className="font-semibold text-amber-800">Colaboradora:</span>{' '}
-                clara.colaboradora@teste.com (Skip@Pass)
-              </p>
-              <p>
-                <span className="font-semibold text-amber-800">Revisora:</span>{' '}
-                renata.revisora@teste.com (Skip@Pass)
-              </p>
-            </div>
-          </div>
+
         </div>
       </div>
     </div>
