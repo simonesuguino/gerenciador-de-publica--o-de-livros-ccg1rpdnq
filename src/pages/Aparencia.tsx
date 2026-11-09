@@ -17,7 +17,7 @@ export default function Aparencia() {
   const { toast } = useToast()
   const [savingTemplate, setSavingTemplate] = useState<string | null>(null)
 
-  const currentPublicTemplate = (book?.public_template as PublicTemplateId) ?? 'editorial'
+  const currentPublicTemplate = (book?.public_template as PublicTemplateId) ?? 'capa_central'
 
   const handlePublicTemplate = async (tpl: string) => {
     if (!book) return

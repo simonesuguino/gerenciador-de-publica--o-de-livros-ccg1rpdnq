@@ -21,6 +21,7 @@ import Marketing from './pages/Marketing'
 import Vendas from './pages/Vendas'
 import Capa from './pages/Capa'
 import Aparencia from './pages/Aparencia'
+import Usuarios from './pages/Usuarios'
 import NotFound from './pages/NotFound'
 
 const App = () => (
@@ -122,6 +123,15 @@ const App = () => (
                 element={
                   <ProtectedRoute>
                     <Aparencia />
+                  </ProtectedRoute>
+                }
+              />
+
+              <Route
+                path="/usuarios"
+                element={
+                  <ProtectedRoute>
+                    <Usuarios />
                   </ProtectedRoute>
                 }
               />

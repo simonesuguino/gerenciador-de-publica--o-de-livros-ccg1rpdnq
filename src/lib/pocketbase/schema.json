@@ -1,15 +1,15 @@
 {
-  "generatedAt": "2026-11-09T01:26:31.242Z",
+  "generatedAt": "2026-11-09T01:39:08.446Z",
   "collections": [
     {
       "name": "users",
       "type": "auth",
       "apiRules": {
-        "list": "id = @request.auth.id",
-        "view": "id = @request.auth.id",
-        "create": "",
-        "update": "id = @request.auth.id",
-        "delete": "id = @request.auth.id"
+        "list": "@request.auth.id != ''",
+        "view": "@request.auth.id != ''",
+        "create": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'administradora' || (id = @request.auth.id && @request.body.role:changed = false && @request.body.is_active:changed = false))",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'administradora' && id != @request.auth.id"
       },
       "fields": [
         {
@@ -37,6 +37,19 @@
           "required": false,
           "system": false,
           "autodateTriggers": ["onCreate", "onUpdate"]
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["administradora", "colaboradora", "revisora"]
+        },
+        {
+          "name": "is_active",
+          "type": "bool",
+          "required": false,
+          "system": false
         }
       ],
       "indexes": [
@@ -50,9 +63,9 @@
       "apiRules": {
         "list": "",
         "view": "",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "create": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = id && @collection.book_access.can_edit = true)",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'administradora'"
       },
       "fields": [
         {
@@ -162,9 +175,9 @@
       "apiRules": {
         "list": "",
         "view": "",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "create": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "delete": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)"
       },
       "fields": [
         {
@@ -226,11 +239,11 @@
       "name": "checklist_items",
       "type": "base",
       "apiRules": {
-        "list": "",
-        "view": "",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id)",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "delete": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)"
       },
       "fields": [
         {
@@ -297,11 +310,11 @@
       "name": "marketing_posts",
       "type": "base",
       "apiRules": {
-        "list": "",
-        "view": "",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id)",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "delete": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)"
       },
       "fields": [
         {
@@ -363,11 +376,11 @@
       "name": "sales",
       "type": "base",
       "apiRules": {
-        "list": "",
-        "view": "",
-        "create": "@request.auth.id != ''",
-        "update": "@request.auth.id != ''",
-        "delete": "@request.auth.id != ''"
+        "list": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id)",
+        "create": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "update": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)",
+        "delete": "@request.auth.id != '' && (@request.auth.role = 'administradora' || @collection.book_access.user_id = @request.auth.id && @collection.book_access.book_id = book_id && @collection.book_access.can_edit = true)"
       },
       "fields": [
         {
@@ -481,6 +494,250 @@
         }
       ],
       "indexes": ["CREATE UNIQUE INDEX idx_user_prefs_user ON user_preferences (user_id)"]
+    },
+    {
+      "name": "book_access",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && (@request.auth.role = 'administradora' || user_id = @request.auth.id)",
+        "view": "@request.auth.id != '' && (@request.auth.role = 'administradora' || user_id = @request.auth.id)",
+        "create": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "update": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'administradora'"
+      },
+      "fields": [
+        {
+          "name": "user_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "book_id",
+          "type": "relation",
+          "required": true,
+          "system": false,
+          "collectionRef": "books"
+        },
+        {
+          "name": "can_view",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "can_comment",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "can_edit",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "can_attach",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "can_download",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "can_export",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_book_access_user_book ON book_access (user_id, book_id)",
+        "CREATE INDEX idx_book_access_user ON book_access (user_id)",
+        "CREATE INDEX idx_book_access_book ON book_access (book_id)"
+      ]
+    },
+    {
+      "name": "invitations",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "view": "used = false || (@request.auth.id != '' && @request.auth.role = 'administradora')",
+        "create": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "update": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "delete": "@request.auth.id != '' && @request.auth.role = 'administradora'"
+      },
+      "fields": [
+        {
+          "name": "email",
+          "type": "email",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "token",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "role",
+          "type": "select",
+          "required": true,
+          "system": false,
+          "selectValues": ["colaboradora", "revisora", "administradora"]
+        },
+        {
+          "name": "book_ids",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "permissions",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "expires_at",
+          "type": "date",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "used",
+          "type": "bool",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "used_at",
+          "type": "date",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created_by",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE UNIQUE INDEX idx_invitations_token ON invitations (token)",
+        "CREATE INDEX idx_invitations_email ON invitations (email)"
+      ]
+    },
+    {
+      "name": "audit_log",
+      "type": "base",
+      "apiRules": {
+        "list": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "view": "@request.auth.id != '' && @request.auth.role = 'administradora'",
+        "create": "@request.auth.id != ''",
+        "update": null,
+        "delete": null
+      },
+      "fields": [
+        {
+          "name": "action",
+          "type": "text",
+          "required": true,
+          "system": false
+        },
+        {
+          "name": "author_id",
+          "type": "relation",
+          "required": false,
+          "system": false,
+          "collectionRef": "users"
+        },
+        {
+          "name": "author_email",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "target_id",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "target_type",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "details",
+          "type": "json",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "ip",
+          "type": "text",
+          "required": false,
+          "system": false
+        },
+        {
+          "name": "created",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate"]
+        },
+        {
+          "name": "updated",
+          "type": "autodate",
+          "required": false,
+          "system": false,
+          "autodateTriggers": ["onCreate", "onUpdate"]
+        }
+      ],
+      "indexes": [
+        "CREATE INDEX idx_audit_created ON audit_log (created DESC)",
+        "CREATE INDEX idx_audit_action ON audit_log (action)",
+        "CREATE INDEX idx_audit_author ON audit_log (author_id)"
+      ]
     }
   ]
 }

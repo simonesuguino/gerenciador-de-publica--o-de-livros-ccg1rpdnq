@@ -31,11 +31,12 @@ import {
   Moon,
   Check,
   Loader2,
+  Shield,
 } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { cn } from '@/lib/utils'
 
-const NAV_ITEMS = [
+const BASE_NAV_ITEMS = [
   { to: '/', label: 'Painel', icon: BookOpen },
   { to: '/estrutura', label: 'Estrutura', icon: ListTree },
   { to: '/editor', label: 'Editor', icon: PenTool },
@@ -109,8 +110,13 @@ function ThemeToggle() {
 
 export function AppLayout({ children }: { children: React.ReactNode }) {
   const location = useLocation()
-  const { user, logout } = useAuth()
+  const { user, role, isAdmin, logout } = useAuth()
   const { book } = useBook()
+
+  const navItems = [
+    ...BASE_NAV_ITEMS,
+    ...(isAdmin ? [{ to: '/usuarios', label: 'Usuários & Permissões', icon: Shield }] : []),
+  ]
 
   return (
     <div className="flex min-h-screen bg-stone-50 dark:bg-stone-950 text-stone-900 dark:text-stone-100">
@@ -129,7 +135,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </div>
 
         <nav className="flex-1 space-y-1 overflow-y-auto p-3">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive =
               item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to)
             return (
@@ -151,7 +157,12 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
         </nav>
 
         <div className="border-t border-stone-200 p-3 dark:border-stone-800">
-          <div className="mb-2 px-2 text-xs text-stone-500 dark:text-stone-400">{user?.email}</div>
+          <div className="mb-1 px-2 text-xs font-semibold text-stone-900 dark:text-stone-100 truncate">
+            {user?.name || user?.email}
+          </div>
+          <div className="mb-2 px-2 text-[10px] text-amber-800 dark:text-amber-400 capitalize">
+            Perfil: {role || 'colaboradora'}
+          </div>
           <Button
             variant="ghost"
             size="sm"
@@ -195,7 +206,7 @@ export function AppLayout({ children }: { children: React.ReactNode }) {
 
         {/* Nav mobile (scroll horizontal) */}
         <nav className="flex gap-1 overflow-x-auto border-b border-stone-200 bg-white px-3 py-2 dark:border-stone-800 dark:bg-stone-900 md:hidden">
-          {NAV_ITEMS.map((item) => {
+          {navItems.map((item) => {
             const isActive =
               item.to === '/' ? location.pathname === '/' : location.pathname.startsWith(item.to)
             return (

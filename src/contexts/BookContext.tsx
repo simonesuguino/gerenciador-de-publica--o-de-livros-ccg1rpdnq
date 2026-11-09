@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useState, useCallback } from 'react'
 import { getBooks, getBookById, createBook, updateBook } from '@/services/books'
+import { useAuth } from '@/contexts/AuthContext'
 import type { BookRecord } from '@/types/book'
 
 interface BookContextValue {
@@ -23,11 +24,25 @@ export function BookProvider({ children }: { children: React.ReactNode }) {
   const [bookId, setBookId] = useState<string | null>(null)
   const [loading, setLoading] = useState(true)
 
+  const { user, isAdmin, bookAccessList } = useAuth()
+
   const loadBooks = useCallback(async () => {
     const all = await getBooks(true)
+    // Se for administradora, acessa todos os livros
+    // Se for colaboradora ou revisora, filtra apenas os livros para os quais tem book_access com can_view
+    if (isAdmin) {
+      setBooks(all)
+      return all
+    }
+    if (user) {
+      const allowedBookIds = new Set(bookAccessList.filter((a) => a.can_view).map((a) => a.book_id))
+      const filtered = all.filter((b) => allowedBookIds.has(b.id))
+      setBooks(filtered)
+      return filtered
+    }
     setBooks(all)
     return all
-  }, [])
+  }, [isAdmin, user, bookAccessList])
 
   // Carrega livros e define o livro ativo (preferência salva ou o primeiro)
   useEffect(() => {

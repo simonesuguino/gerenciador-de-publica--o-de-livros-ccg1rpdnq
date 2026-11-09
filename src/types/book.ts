@@ -139,9 +139,66 @@ export const PUBLIC_TEMPLATES: { id: PublicTemplateId; name: string; description
   },
 ]
 
+export type UserRole = 'administradora' | 'colaboradora' | 'revisora'
+
 export interface UserRecord {
   id: string
   email: string
   name?: string
   avatar?: string
+  role: UserRole
+  is_active?: boolean
+}
+
+export interface BookAccessRecord {
+  id: string
+  user_id: string
+  book_id: string
+  can_view: boolean
+  can_comment: boolean
+  can_edit: boolean
+  can_attach: boolean
+  can_download: boolean
+  can_export: boolean
+  created: string
+  updated: string
+  expand?: {
+    user_id?: UserRecord
+    book_id?: BookRecord
+  }
+}
+
+export interface InvitationRecord {
+  id: string
+  email: string
+  token: string
+  role: UserRole
+  book_ids?: string[]
+  permissions?: {
+    can_view?: boolean
+    can_comment?: boolean
+    can_edit?: boolean
+    can_attach?: boolean
+    can_download?: boolean
+    can_export?: boolean
+  }
+  expires_at: string
+  used: boolean
+  used_at?: string
+  created_by?: string
+  created: string
+  updated: string
+}
+
+export interface AuditLogRecord {
+  id: string
+  action: string
+  author_id?: string
+  author_email?: string
+  target_id?: string
+  target_type?: string
+  details?: Record<string, unknown> | string
+  ip?: string
+  created: string
+  updated: string
 }

@@ -2,6 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { AppLayout } from '@/components/AppLayout'
 import { getFirstBook } from '@/services/books'
 import { getChapters } from '@/services/chapters'
+import { useAuth } from '@/contexts/AuthContext'
 import type { BookRecord, ChapterRecord } from '@/types/book'
 import { countWords, formatNumber, estimateReadingTime } from '@/lib/bookUtils'
 import { exportToPrintablePDF, exportToEPUB } from '@/lib/bookExporter'
@@ -23,9 +24,12 @@ import { Badge } from '@/components/ui/badge'
 import { toast } from '@/hooks/use-toast'
 
 export default function Export() {
+  const { user, isRevisora, canExportBook } = useAuth()
   const [book, setBook] = useState<BookRecord | null>(null)
   const [chapters, setChapters] = useState<ChapterRecord[]>([])
   const [loading, setLoading] = useState(true)
+
+  const isExportBlocked = isRevisora || (book ? !canExportBook(book.id) : false)
 
   useEffect(() => {
     load()
@@ -43,6 +47,15 @@ export default function Export() {
   }
 
   const handleExportPDF = () => {
+    if (isExportBlocked) {
+      toast({
+        title: 'Exportação bloqueada',
+        description: 'Seu perfil não possui permissão para exportar este manuscrito.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     if (!book || chapters.length === 0) {
       toast({
         title: 'Livro vazio',
@@ -69,6 +82,15 @@ export default function Export() {
   }
 
   const handleExportEPUB = () => {
+    if (isExportBlocked) {
+      toast({
+        title: 'Exportação bloqueada',
+        description: 'Seu perfil não possui permissão para exportar este manuscrito.',
+        variant: 'destructive',
+      })
+      return
+    }
+
     if (!book || chapters.length === 0) {
       toast({
         title: 'Livro vazio',

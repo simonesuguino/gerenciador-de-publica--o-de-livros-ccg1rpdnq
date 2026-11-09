@@ -3,6 +3,7 @@ import { useSearchParams, Link } from 'react-router-dom'
 import { AppLayout } from '@/components/AppLayout'
 import { getFirstBook } from '@/services/books'
 import { getChapters, updateChapter, getChapterById } from '@/services/chapters'
+import { useAuth } from '@/contexts/AuthContext'
 import type { BookRecord, ChapterRecord } from '@/types/book'
 import { countWords, formatNumber, estimateReadingTime } from '@/lib/bookUtils'
 import {
@@ -31,6 +32,7 @@ import {
 import { toast } from '@/hooks/use-toast'
 
 export default function Editor() {
+  const { user, isRevisora, canEditBook } = useAuth()
   const [searchParams, setSearchParams] = useSearchParams()
   const [book, setBook] = useState<BookRecord | null>(null)
   const [chapters, setChapters] = useState<ChapterRecord[]>([])
@@ -81,22 +83,31 @@ export default function Editor() {
     setSearchParams({ capitulo: chap.id }, { replace: true })
   }
 
-  const saveContent = useCallback(async (chapId: string, newContent: string, newTitle: string) => {
-    setSaveStatus('saving')
-    try {
-      const updated = await updateChapter(chapId, {
-        content: newContent,
-        title: newTitle,
-      })
-      lastSavedContentRef.current = newContent
-      setSaveStatus('saved')
-      // update local list
-      setChapters((prev) => prev.map((c) => (c.id === chapId ? updated : c)))
-    } catch (err) {
-      console.error('Erro no autosave:', err)
-      setSaveStatus('dirty')
-    }
-  }, [])
+  const isReadOnly = isRevisora || (book ? !canEditBook(book.id) : false)
+
+  const saveContent = useCallback(
+    async (chapId: string, newContent: string, newTitle: string) => {
+      if (isReadOnly) {
+        setSaveStatus('saved')
+        return
+      }
+      setSaveStatus('saving')
+      try {
+        const updated = await updateChapter(chapId, {
+          content: newContent,
+          title: newTitle,
+        })
+        lastSavedContentRef.current = newContent
+        setSaveStatus('saved')
+        // update local list
+        setChapters((prev) => prev.map((c) => (c.id === chapId ? updated : c)))
+      } catch (err) {
+        console.error('Erro no autosave:', err)
+        setSaveStatus('dirty')
+      }
+    },
+    [isReadOnly],
+  )
 
   const handleContentChange = (e: React.ChangeEvent<HTMLTextAreaElement>) => {
     const val = e.target.value
@@ -259,25 +270,35 @@ export default function Editor() {
               isDistractionFree ? 'max-w-4xl min-h-[85vh]' : 'max-w-3xl min-h-[75vh]'
             }`}
           >
+            {isReadOnly && (
+              <div className="mb-4 rounded-lg bg-stone-100 border border-stone-200 p-2.5 text-xs text-stone-600 flex items-center gap-2">
+                <span className="font-semibold text-stone-800">Modo de Leitura / Revisão:</span>
+                Edição desabilitada para seu perfil de revisora.
+              </div>
+            )}
+
             {/* Chapter Title Input */}
             <input
               type="text"
+              disabled={isReadOnly}
               value={title}
               onChange={(e) => {
+                if (isReadOnly) return
                 setTitle(e.target.value)
                 setSaveStatus('dirty')
               }}
               onBlur={handleTitleBlur}
               placeholder="Título do Capítulo..."
-              className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-stone-900 placeholder:text-stone-300 border-none outline-none mb-6 w-full focus:ring-0"
+              className="font-serif text-2xl md:text-3xl font-bold tracking-tight text-stone-900 placeholder:text-stone-300 border-none outline-none mb-6 w-full focus:ring-0 disabled:bg-transparent disabled:opacity-80"
             />
 
             {/* Main Textarea */}
             <textarea
+              disabled={isReadOnly}
               value={content}
               onChange={handleContentChange}
               placeholder="Comece a escrever seu capítulo aqui... Seu texto é salvo automaticamente a cada pausa."
-              className="flex-1 w-full resize-none font-serif text-base md:text-lg leading-relaxed text-stone-800 placeholder:text-stone-300 border-none outline-none focus:ring-0 min-h-[500px]"
+              className="flex-1 w-full resize-none font-serif text-base md:text-lg leading-relaxed text-stone-800 placeholder:text-stone-300 border-none outline-none focus:ring-0 min-h-[500px] disabled:bg-transparent disabled:opacity-80"
             />
 
             {/* Sheet Footer */}
