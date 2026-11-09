@@ -232,11 +232,6 @@ export default function Marketing() {
               <ConnectorButton toolkit="whatsapp" name="WhatsApp" className="flex items-center" />
               <ConnectorButton toolkit="mailchimp" name="Mailchimp" className="flex items-center" />
               <ConnectorButton toolkit="canva" name="Canva" className="flex items-center" />
-              <ConnectorButton
-                toolkit="googleanalytics"
-                name="Google Analytics"
-                className="flex items-center"
-              />
             </div>
           </CardContent>
         </Card>

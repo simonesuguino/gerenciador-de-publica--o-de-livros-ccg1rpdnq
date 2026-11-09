@@ -28,10 +28,11 @@ const DEFAULT_CUSTOM: CoverRenderData = {
   alignment: 'center',
 }
 
-export const Capa: React.FC = () => {
+export default function Capa() {
   const { book, refresh } = useBook()
   const { toast } = useToast()
   const [saving, setSaving] = useState(false)
+  const [formatView, setFormatView] = useState<'digital' | 'impresso'>('digital')
   const [custom, setCustom] = useState<CoverRenderData>(DEFAULT_CUSTOM)
 
   // Sincroniza o editor com o livro ativo
@@ -64,8 +65,8 @@ export const Capa: React.FC = () => {
   // Pré-visualização da capa personalizada
   const previewUrl = useMemo(() => {
     if (custom.title === '') return null
-    return renderCoverDataUrl(custom)
-  }, [custom])
+    return renderCoverDataUrl({ ...custom, format: formatView })
+  }, [custom, formatView])
 
   // Pré-visualizações da galeria com dados do livro ativo
   const templatePreviews = useMemo(() => {
@@ -74,9 +75,9 @@ export const Capa: React.FC = () => {
     return COVER_TEMPLATES.map((tpl) => ({
       id: tpl.id,
       name: tpl.name,
-      url: renderCoverDataUrl({ ...data, ...tpl.defaults }),
+      url: renderCoverDataUrl({ ...data, ...tpl.defaults, format: formatView }),
     }))
-  }, [book])
+  }, [book, formatView])
 
   const applyTemplate = useCallback(
     async (tplId: string, customData?: object) => {
@@ -119,18 +120,47 @@ export const Capa: React.FC = () => {
   }
 
   const currentData = book ? coverDataFromBook(book) : null
-  const currentUrl = currentData ? renderCoverDataUrl(currentData) : null
+  const currentUrl = currentData ? renderCoverDataUrl({ ...currentData, format: formatView }) : null
   const usingCustom = book?.cover_template === CUSTOM_COVER_ID
 
   return (
     <AppLayout>
       <div className="mx-auto max-w-6xl space-y-6 p-6 md:p-10">
         <div className="border-b border-stone-200 pb-5 dark:border-stone-800">
-          <h1 className="font-serif text-2xl font-bold md:text-3xl">Capa do livro</h1>
-          <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
-            Escolha um template da galeria ou personalize — a capa aparece na exportação e na página
-            pública de <strong>{book ? book.title : '—'}</strong>
-          </p>
+          <div className="flex flex-wrap items-center justify-between gap-4">
+            <div>
+              <h1 className="font-serif text-2xl font-bold md:text-3xl">Capa do livro</h1>
+              <p className="mt-1 text-sm text-stone-500 dark:text-stone-400">
+                Escolha um template da galeria ou personalize — a capa aparece na exportação e na
+                página pública de <strong>{book ? book.title : '—'}</strong>
+              </p>
+            </div>
+            {/* Seletor de formato: Digital x Impresso */}
+            <div className="inline-flex rounded-lg border border-stone-200 bg-stone-100 p-1 dark:border-stone-800 dark:bg-stone-900">
+              <button
+                type="button"
+                onClick={() => setFormatView('digital')}
+                className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                  formatView === 'digital'
+                    ? 'bg-white text-stone-900 shadow-xs dark:bg-stone-800 dark:text-stone-100'
+                    : 'text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100'
+                }`}
+              >
+                📱 Digital / e-Book
+              </button>
+              <button
+                type="button"
+                onClick={() => setFormatView('impresso')}
+                className={`rounded-md px-3 py-1.5 text-xs font-semibold transition ${
+                  formatView === 'impresso'
+                    ? 'bg-white text-stone-900 shadow-xs dark:bg-stone-800 dark:text-stone-100'
+                    : 'text-stone-600 hover:text-stone-900 dark:text-stone-400 dark:hover:text-stone-100'
+                }`}
+              >
+                📖 Impresso (com lombada/corte)
+              </button>
+            </div>
+          </div>
         </div>
 
         {!book ? (

@@ -5,6 +5,7 @@ import { getChapters } from '@/services/chapters'
 import type { BookRecord, ChapterRecord } from '@/types/book'
 import { countWords, formatNumber, estimateReadingTime } from '@/lib/bookUtils'
 import { exportToPrintablePDF, exportToEPUB } from '@/lib/bookExporter'
+import { renderCoverDataUrl, resolveCoverData } from '@/lib/coverTemplates'
 import {
   Download,
   FileText,
@@ -125,12 +126,20 @@ export default function Export() {
           </p>
         </div>
 
-        {/* Book Overview Card */}
+        {/* Book Overview Card with dynamic cover preview */}
         <div className="rounded-2xl border border-stone-200 bg-white p-6 shadow-xs flex flex-col md:flex-row items-start md:items-center justify-between gap-6">
           <div className="flex items-center gap-4">
-            <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-amber-500 font-serif font-bold shadow-md">
-              CT
-            </div>
+            {book ? (
+              <img
+                src={renderCoverDataUrl(resolveCoverData(book, { format: 'impresso' }))}
+                alt={`Capa de ${book.title}`}
+                className="h-20 w-14 shrink-0 rounded-md border border-stone-200 object-cover shadow-md"
+              />
+            ) : (
+              <div className="flex h-16 w-12 shrink-0 items-center justify-center rounded-lg bg-stone-900 text-amber-500 font-serif font-bold shadow-md">
+                CT
+              </div>
+            )}
             <div>
               <h2 className="font-serif text-xl font-bold text-stone-900">{book?.title}</h2>
               <p className="text-xs text-stone-500 mt-0.5">{book?.subtitle}</p>
@@ -140,6 +149,8 @@ export default function Export() {
                 <span>{formatNumber(totalWords)} palavras</span>
                 <span>•</span>
                 <span>{estimateReadingTime(totalWords)}</span>
+                <span>•</span>
+                <span className="text-amber-700 font-medium">Capa vinculada automaticamente</span>
               </div>
             </div>
           </div>

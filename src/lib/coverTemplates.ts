@@ -19,6 +19,8 @@ export interface CoverTemplate {
   defaults: TemplateDefaults
 }
 
+export type CoverFormat = 'digital' | 'impresso'
+
 export interface CoverRenderData {
   title: string
   subtitle?: string
@@ -29,6 +31,8 @@ export interface CoverRenderData {
   fontFamily: string
   /** Layout custom: onde o bloco de texto fica */
   alignment?: 'top' | 'center' | 'bottom'
+  /** Formato: digital (1:1.5 - padrão e-book) ou impresso (com lombada e orelhas ilustradas) */
+  format?: CoverFormat
 }
 
 /** Dados do livro + preferências do template ativo ou custom. */
@@ -111,9 +115,31 @@ export function renderCoverSVG(data: CoverRenderData): string {
   // Ornamento decorativo acima do título
   body += `<line x1="300" y1="${titleY - 60}" x2="500" y2="${titleY - 60}" stroke="${data.accentColor}" stroke-width="2"/>`
 
+  // Se for impresso, adicionamos marcas de corte / sangria e lombada simulada à esquerda
+  const isPrint = data.format === 'impresso'
+  const printSpine = isPrint
+    ? `<rect x="0" y="0" width="48" height="1200" fill="${data.accentColor}" opacity="0.18"/>
+       <line x1="48" y1="0" x2="48" y2="1200" stroke="${data.accentColor}" stroke-width="2" stroke-dasharray="6 4" opacity="0.6"/>
+       <text x="24" y="600" font-family="${data.fontFamily}" font-size="14" font-weight="bold" fill="${data.textColor}" text-anchor="middle" transform="rotate(-90 24 600)" letter-spacing="3">${title.toUpperCase()} • ${author.toUpperCase()}</text>`
+    : ''
+
+  const printMarks = isPrint
+    ? `<line x1="0" y1="20" x2="30" y2="20" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="20" y1="0" x2="20" y2="30" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="770" y1="20" x2="800" y2="20" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="780" y1="0" x2="780" y2="30" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="0" y1="1180" x2="30" y2="1180" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="20" y1="1170" x2="20" y2="1200" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="770" y1="1180" x2="800" y2="1180" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <line x1="780" y1="1170" x2="780" y2="1200" stroke="${data.textColor}" stroke-width="1" opacity="0.4"/>
+       <text x="400" y="1175" font-family="${data.fontFamily}" font-size="11" fill="${data.textColor}" opacity="0.5" text-anchor="middle" letter-spacing="1">FORMATO IMPRESSO • COM SANGRIA E MARCAS DE CORTE</text>`
+    : ''
+
   return `<svg xmlns="http://www.w3.org/2000/svg" width="800" height="1200" viewBox="0 0 800 1200">
   <rect width="800" height="1200" fill="${data.backgroundColor}"/>
   <rect x="40" y="40" width="720" height="1120" fill="none" stroke="${data.accentColor}" stroke-width="1" opacity="0.35"/>
+  ${printSpine}
+  ${printMarks}
   ${body}
 </svg>`
 }

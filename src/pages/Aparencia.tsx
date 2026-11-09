@@ -4,21 +4,20 @@ import { usePreferences, ACCENT_OPTIONS } from '@/contexts/PreferencesContext'
 import { useBook } from '@/contexts/BookContext'
 import { updateBook } from '@/services/books'
 import { useToast } from '@/hooks/use-toast'
-import { renderCoverDataUrl } from '@/lib/coverTemplates'
+import { renderCoverDataUrl, resolveCoverData } from '@/lib/coverTemplates'
 import { Check, Loader2, Moon, Palette, Sun } from 'lucide-react'
 import { useState } from 'react'
 import { Label } from '@/components/ui/label'
-import type { BookRecord } from '@/types/book'
+import type { BookRecord, PublicTemplateId } from '@/types/book'
+import { PUBLIC_TEMPLATES } from '@/types/book'
 
-const PUBLIC_TEMPLATES_FOR_PREVIEW = ['classico', 'moderno', 'elegante'] as const
-
-export const Aparencia: React.FC = () => {
+export default function Aparencia() {
   const { themeMode, setThemeMode, accentColor, setAccentColor } = usePreferences()
   const { book, refresh } = useBook()
   const { toast } = useToast()
   const [savingTemplate, setSavingTemplate] = useState<string | null>(null)
 
-  const currentPublicTemplate = book?.public_template ?? 'classico'
+  const currentPublicTemplate = (book?.public_template as PublicTemplateId) ?? 'editorial'
 
   const handlePublicTemplate = async (tpl: string) => {
     if (!book) return
@@ -146,13 +145,13 @@ export const Aparencia: React.FC = () => {
               </Label>
             )}
             <div className="grid gap-4 sm:grid-cols-3">
-              {PUBLIC_TEMPLATES_FOR_PREVIEW.map((tpl) => {
-                const active = currentPublicTemplate === tpl
+              {PUBLIC_TEMPLATES.map((tpl) => {
+                const active = currentPublicTemplate === tpl.id
                 return (
-                  <div key={tpl} className="space-y-2">
+                  <div key={tpl.id} className="space-y-2">
                     <button
                       type="button"
-                      onClick={() => handlePublicTemplate(tpl)}
+                      onClick={() => handlePublicTemplate(tpl.id)}
                       disabled={savingTemplate !== null}
                       className={`block w-full overflow-hidden rounded-lg border-2 text-left transition ${
                         active
@@ -160,14 +159,17 @@ export const Aparencia: React.FC = () => {
                           : 'border-stone-200 hover:border-stone-300'
                       }`}
                     >
-                      <TemplateMockup tpl={tpl} book={previewBook} />
+                      <TemplateMockup tpl={tpl.id} book={previewBook} />
                     </button>
-                    <div className="flex items-center justify-between px-1">
-                      <span className="text-xs font-medium capitalize text-stone-600">{tpl}</span>
-                      {active && <Check className="h-3.5 w-3.5 text-amber-700" />}
-                      {savingTemplate === tpl && (
-                        <Loader2 className="h-3.5 w-3.5 animate-spin text-stone-400" />
-                      )}
+                    <div className="px-1">
+                      <div className="flex items-center justify-between">
+                        <span className="text-xs font-bold text-stone-800">{tpl.name}</span>
+                        {active && <Check className="h-3.5 w-3.5 text-amber-700" />}
+                        {savingTemplate === tpl.id && (
+                          <Loader2 className="h-3.5 w-3.5 animate-spin text-stone-400" />
+                        )}
+                      </div>
+                      <p className="text-[11px] text-stone-500 mt-0.5">{tpl.description}</p>
                     </div>
                   </div>
                 )
@@ -182,39 +184,41 @@ export const Aparencia: React.FC = () => {
 
 // Miniatura ilustrativa de cada layout público
 function TemplateMockup({ tpl, book }: { tpl: string; book: BookRecord }) {
-  const cover = renderCoverDataUrl(book.cover_template ?? 'classico-minimalista', book)
-  const bg =
-    tpl === 'escuro'
-      ? 'bg-stone-900'
-      : tpl === 'moderno'
-        ? 'bg-gradient-to-br from-stone-50 to-amber-50'
-        : 'bg-stone-50'
+  const coverData = resolveCoverData(book)
+  const cover = renderCoverDataUrl(coverData)
+  const isDark = tpl === 'moderno'
+  const isMinimal = tpl === 'minimalista'
+  const bg = isDark
+    ? 'bg-stone-900 text-stone-100'
+    : isMinimal
+      ? 'bg-white text-neutral-900'
+      : 'bg-stone-100 text-stone-900'
 
   return (
-    <div className={`${bg} space-y-2 p-3`}>
+    <div className={`${bg} space-y-2 p-3 transition-colors`}>
       <div className="flex gap-3">
         {cover ? (
-          <img src={cover} alt="" className="aspect-[2/3] w-12 rounded shadow" />
+          <img src={cover} alt="" className="aspect-[2/3] w-12 rounded shadow object-cover" />
         ) : (
           <div className="aspect-[2/3] w-12 rounded bg-stone-300" />
         )}
         <div className="min-w-0 flex-1 space-y-1.5 py-1">
           <div
-            className={`h-2 w-3/4 rounded ${tpl === 'escuro' ? 'bg-stone-600' : 'bg-stone-300'}`}
+            className={`h-2 w-3/4 rounded ${isDark ? 'bg-amber-500' : isMinimal ? 'bg-neutral-800' : 'bg-amber-800'}`}
           />
           <div
-            className={`h-2 w-1/2 rounded ${tpl === 'escuro' ? 'bg-stone-700' : 'bg-stone-200'}`}
+            className={`h-2 w-1/2 rounded ${isDark ? 'bg-stone-600' : isMinimal ? 'bg-neutral-300' : 'bg-stone-300'}`}
           />
           <div
-            className={`h-2 w-2/3 rounded ${tpl === 'escuro' ? 'bg-amber-800' : 'bg-amber-200'}`}
+            className={`h-2 w-2/3 rounded ${isDark ? 'bg-amber-800' : isMinimal ? 'bg-neutral-400' : 'bg-amber-200'}`}
           />
         </div>
       </div>
-      <div className="space-y-1">
+      <div className="space-y-1 pt-1">
         {[1, 2, 3].map((i) => (
           <div
             key={i}
-            className={`h-1.5 rounded ${tpl === 'escuro' ? 'bg-stone-800' : 'bg-stone-100'}`}
+            className={`h-1.5 rounded ${isDark ? 'bg-stone-800' : isMinimal ? 'bg-neutral-100' : 'bg-stone-200'}`}
             style={{ width: `${95 - i * 12}%` }}
           />
         ))}

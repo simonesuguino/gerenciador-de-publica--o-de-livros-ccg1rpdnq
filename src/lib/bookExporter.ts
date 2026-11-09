@@ -1,4 +1,5 @@
 import type { ChapterRecord, BookRecord } from '@/types/book'
+import { renderCoverSVG, resolveCoverData } from '@/lib/coverTemplates'
 
 /**
  * Generates and triggers download of a clean HTML/printable PDF view
@@ -212,11 +213,15 @@ export function exportToPrintablePDF(book: BookRecord, chapters: ChapterRecord[]
 
       <div class="container">
         <section class="cover-page">
+          <div style="width: 100%; max-width: 420px; margin-bottom: 24px;">
+            ${renderCoverSVG(resolveCoverData(book, { format: 'impresso' }))}
+          </div>
           <h1 class="book-title">${escapeHtml(book.title)}</h1>
           ${book.subtitle ? `<h2 class="book-subtitle">${escapeHtml(book.subtitle)}</h2>` : ''}
           <div class="book-meta">
+            ${book.author_name ? `<span>Por ${escapeHtml(book.author_name)}</span> • ` : ''}
             ${book.genre ? `<span>${escapeHtml(book.genre)}</span> • ` : ''}
-            <span>Edição do Autor</span>
+            <span>Edição Impressa</span>
           </div>
         </section>
 
@@ -294,6 +299,8 @@ export function exportToEPUB(book: BookRecord, chapters: ChapterRecord[]) {
     })
     .join('\n\n')
 
+  const coverSvg = renderCoverSVG(resolveCoverData(book, { format: 'digital' }))
+
   const epubHtml = `<?xml version="1.0" encoding="utf-8"?>
 <!DOCTYPE html>
 <html xmlns="http://www.w3.org/1999/xhtml" xmlns:epub="http://www.idpf.org/2007/ops" lang="pt-BR" xml:lang="pt-BR">
@@ -364,8 +371,12 @@ export function exportToEPUB(book: BookRecord, chapters: ChapterRecord[]) {
 </head>
 <body>
   <header class="book-header">
+    <div style="text-align: center; margin: 2em auto; max-width: 380px;">
+      ${coverSvg}
+    </div>
     <h1 class="title">${bookTitle}</h1>
     ${bookSubtitle ? `<h2 class="subtitle">${bookSubtitle}</h2>` : ''}
+    ${book.author_name ? `<p style="text-align:center; font-style:italic; color:#666;">Por ${escapeHtml(book.author_name)}</p>` : ''}
   </header>
 
   <nav id="toc" epub:type="toc">

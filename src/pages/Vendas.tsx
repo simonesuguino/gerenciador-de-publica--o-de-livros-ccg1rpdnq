@@ -22,13 +22,13 @@ import {
 import { useToast } from '@/hooks/use-toast'
 import { useBook } from '@/contexts/BookContext'
 import { createSale, deleteSale, getSales, updateSale } from '@/services/sales'
-import { SALES_PLATFORMS, type SaleRecord } from '@/types/book'
+import { SALES_PLATFORMS, type SaleRecord, type SalesPlatform } from '@/types/book'
 import { formatCurrency, formatNumber } from '@/lib/bookUtils'
 import { format } from 'date-fns'
 import { ptBR } from 'date-fns/locale'
 import { BookOpen, Loader2, Pencil, Plus, Trash2, TrendingUp } from 'lucide-react'
 
-export const Vendas: React.FC = () => {
+export default function Vendas() {
   const { book } = useBook()
   const { toast } = useToast()
   const [sales, setSales] = useState<SaleRecord[]>([])
@@ -37,7 +37,13 @@ export const Vendas: React.FC = () => {
   const [dialogOpen, setDialogOpen] = useState(false)
   const [editing, setEditing] = useState<SaleRecord | null>(null)
   const [deleting, setDeleting] = useState<SaleRecord | null>(null)
-  const [form, setForm] = useState({
+  const [form, setForm] = useState<{
+    sale_date: string
+    platform: SalesPlatform
+    units: string
+    revenue: string
+    notes: string
+  }>({
     sale_date: '',
     platform: 'amazon_kdp',
     units: '1',
@@ -391,7 +397,7 @@ export const Vendas: React.FC = () => {
                 <Label>Loja</Label>
                 <Select
                   value={form.platform}
-                  onValueChange={(v) => setForm((f) => ({ ...f, platform: v }))}
+                  onValueChange={(v) => setForm((f) => ({ ...f, platform: v as SalesPlatform }))}
                 >
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione" />
